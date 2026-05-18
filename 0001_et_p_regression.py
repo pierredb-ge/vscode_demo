@@ -37,7 +37,7 @@ import matplotlib.dates as mdates
 input_path = Path(
     r"C:\_DE\Davids Engineering\DE_Development - Documents"
     r"\Training\20260430_DE_Techathon\Spatial Hydrology\Python"
-    r"\exports\daily_timeseries_cimis_techathon_v2.xlsx"
+    r"\exports\daily_timeseries_cimis_techathon_v1.xlsx"
 )
 
 # %%
@@ -63,7 +63,8 @@ cum_et_arr = np.nancumsum(et_arr)
 
 # Force regression through origin: ET_cum = slope * P_cum
 # Using least-squares: slope = sum(x*y) / sum(x*x)
-slope = np.dot(cum_p_arr, cum_et_arr) / np.dot(cum_p_arr, cum_p_arr)
+# Important: work on cumulated rasters!!
+slope = np.dot(p_arr, cum_et_arr) / np.dot(cum_p_arr, cum_p_arr)
 
 reg_cum_arr = slope * cum_p_arr # regression-predicted cumulative ET
 
@@ -71,8 +72,21 @@ ss_res = np.sum((cum_et_arr - reg_cum_arr) ** 2)
 ss_tot = np.sum((cum_et_arr - np.mean(cum_et_arr)) ** 2)
 r_sq = 1.0 - ss_res / ss_tot
 
-print(f"Slope (ET/P fraction) : {slope:.4f}")
-print(f"R-squared             : {r_sq:.4f}")
+print(f"Slope (ET/P fraction): {slope:.4f}")
+
+# # %%
+# ###############################################################################
+# ### Regression residual statistics ############################################
+# ###############################################################################
+
+# residuals_arr = cum_et_arr - reg_cum_arr
+# rmse = np.sqrt(np.mean(residuals_arr ** 2))
+# mae = np.mean(np.abs(residuals_arr))
+# max_err = np.max(np.abs(residuals_arr))
+
+# print(f"RMSE (cumulative ET) : {rmse:.4f} in")
+# print(f"MAE  (cumulative ET) : {mae:.4f} in")
+# print(f"Max error            : {max_err:.4f} in")
 
 # %%
 ###############################################################################
